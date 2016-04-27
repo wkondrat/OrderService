@@ -5,8 +5,6 @@
  */
 package pl.luciow.warehouse;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,48 +27,44 @@ public class OrderServiceTest {
 
 	@Test
 	public void fillOrderSuccesTest() throws NotEnoughItemsException, OrderProcessException {
+		// given
 		Warehouse warehouseMock = Mockito.mock(Warehouse.class);
 		orderService = new OrderServiceImpl(null, null, warehouseMock);
-		try {
-			Mockito.when(warehouseMock.removeItems(Mockito.any(List.class))).thenReturn(null);
-			orderService.fillOrder(new Order());
-		} catch (Exception e) {
-			assertTrue(false);
-		}
-		assertTrue(true);
+		// when
+		Mockito.when(warehouseMock.removeItems(Mockito.any(List.class))).thenReturn(null);
+		// then
+		orderService.fillOrder(new Order());
 	}
 
 	@Test(expected = OrderProcessException.class)
 	public void fillOrderThrowTest() throws NotEnoughItemsException, OrderProcessException {
+		// given
 		Warehouse warehouseMock = Mockito.mock(Warehouse.class);
 		orderService = new OrderServiceImpl(null, null, warehouseMock);
-		try {
-			Mockito.when(warehouseMock.removeItems(Mockito.any(List.class))).thenThrow(new NotEnoughItemsException());
-			orderService.fillOrder(new Order());
-		} catch (NotEnoughItemsException e) {
-			assertTrue(true);
-		}
-		assertTrue(true);
+		// when
+		Mockito.when(warehouseMock.removeItems(Mockito.any(List.class))).thenThrow(new NotEnoughItemsException());
+		// then
+		orderService.fillOrder(new Order());
 	}
 
 	@Test
 	public void cancelOrderTest() throws OrderProcessException {
+		// given
 		Warehouse warehouseMock = Mockito.mock(WarehouseImpl.class);
 		Order order = new Order();
 		order.setItems(new ArrayList<Item>());
 		order.getItems().add(new Item());
 		orderService = new OrderServiceImpl(null, null, warehouseMock);
-		try {
-			Mockito.doCallRealMethod().when(warehouseMock).addItems(Mockito.any(List.class));
-			orderService.cancelOrder(order);
-		} catch (Exception e) {
-			assertTrue(false);
-		}
-		assertTrue(true);
+		// when
+		Mockito.doCallRealMethod().when(warehouseMock).addItems(Mockito.any(List.class));
+		// then
+		orderService.cancelOrder(order);
+		Mockito.verify(warehouseMock, Mockito.times(1)).addItems(Mockito.any(List.class));
 	}
 
 	@Test
 	public void processPaymentThrowTest() throws Exception {
+		// given
 		class MyArgumentMatcher extends ArgumentMatcher<Object> {
 			public boolean matches(Object mail) {
 				return ((Mail) mail).getContent().equals("Error occured");
@@ -81,13 +75,16 @@ public class OrderServiceTest {
 		orderService = new OrderServiceImpl(mailServiceMock, paymentService, null);
 		Order order = new Order();
 		Payment payment = new Payment();
+		// when
 		Mockito.when(paymentService.processPayment(Mockito.any(Payment.class))).thenThrow(new Exception());
+		// then
 		orderService.processPayment(order, payment);
 		Mockito.verify(mailServiceMock).sendMail((Mail) Mockito.argThat(new MyArgumentMatcher()));
 	}
 
 	@Test
 	public void processPaymentSuccessTest() throws Exception {
+		// given
 		class MyArgumentMatcher extends ArgumentMatcher<Object> {
 			public boolean matches(Object mail) {
 				return ((Mail) mail).getContent().equals("Success");
@@ -99,7 +96,9 @@ public class OrderServiceTest {
 		Order order = new Order();
 		Payment payment = new Payment();
 		Long longVal = new Long(2);
+		// when
 		Mockito.when(paymentService.processPayment(Mockito.any(Payment.class))).thenReturn(longVal);
+		// then
 		orderService.processPayment(order, payment);
 		Mockito.verify(mailServiceMock).sendMail((Mail) Mockito.argThat(new MyArgumentMatcher()));
 	}

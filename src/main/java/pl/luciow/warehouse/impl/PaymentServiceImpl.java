@@ -17,13 +17,13 @@ import pl.luciow.warehouse.util.ValidatorUtils;
  */
 public class PaymentServiceImpl implements PaymentService {
 
-    private Validator<Payment> validator;
+	private Validator<Payment> validator;
 
-    private PaymentProcessor paymentProcessor;
+	private PaymentProcessor paymentProcessor;
 
-    public Long processPayment(Payment payment) throws Exception {
-        ValidatorUtils.validate(payment, validator);
-        return paymentProcessor.processPayment(payment);
-    }
+	public Long processPayment(Payment payment) throws Exception {
+		ValidatorUtils.validate(payment, validator);
+		return paymentProcessor.processPayment(payment);
+	}
 
 }
